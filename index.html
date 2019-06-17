@@ -11,30 +11,83 @@
   <body>
     <div id='root'></div>
     <script type='text/babel'>
+    const {HashRouter, Link, Route} = ReactRouterDOM;
 
-      class App extends React.Component{
+      class Products extends React.Component{
         constructor(){
           super();
           this.state = {
-            data: 0
+            products: []
           }
         }
 
-        componentDidMount(){
-          axios.get('/api/products')
-            .then(response => response.data)
-            .then(data => this.setState({data: data}))
+        async componentDidMount(){
+          const response = await fetch('/api/products/');
+          const products = await response.json();
+          this.setState({products});
+          console.log(products);
+
 
         }
 
         render(){
-          const { data } = this.state;
+          const { products } = this.state;
           return(
-            <div>{data}</div>
+            <div>{products.length}
+            <div>
+              <ul>{
+                products.map((product, idx)=>(
+                  <li key={idx}>{product.name}</li>
+                ))
+
+              }
+              </ul>
+            </div>
+            </div>
           )
         }
 
 
+      }
+
+      class CreateProd extends React.Component{
+        constructor(){
+          super();
+          this.state = {
+            prod: ""
+          }
+        }
+
+        render(){
+
+
+
+        return(
+          <form onSubmit="sumbit">
+            <input name="name" type="text" value ="prod" onChange = "onChange"/>
+            <button type='submit'>Create a Product</button>
+          </form>
+        )
+
+        }
+
+      }
+
+      const Home = ()=>(<div>Home</div>);
+
+      const App = ()=>
+      {
+        return(
+          <HashRouter>
+            <h2>Acme Products</h2>
+            <Link to = '/'>Home</Link>
+            <Link to = '/products'>Products</Link>
+            <Link to = '/create'>Create A Product</Link>
+            <Route path = '/' exact component = {Home}/>
+            <Route path = '/products' component = {Products}/>
+            <Route path = '/create' component = {CreateProd}/>
+          </HashRouter>
+        )
       }
 
       const root = document.querySelector('#root');
