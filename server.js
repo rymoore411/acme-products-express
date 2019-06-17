@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 const fs = require('fs')
+app.use(express.json())
 
 const path = require('path')
 const FILE = path.join(__dirname, 'products.json')
@@ -59,5 +60,20 @@ write(FILE, [{name: 'moe'}, {name: 'larry'}])
 app.get('/', (req, res, next)=> res.sendFile(path.join(__dirname, 'index.html')));
 
 app.get('/api/products', (req, res, next)=> res.sendFile(path.join(__dirname, 'products.json')));
+
+app.post('/api/products', (req, res, next)=> {
+  const post = req.body;
+  console.log(post);
+
+  write(FILE, [{name: 'moe'}, {name: 'larry'}])
+  .then(()=> read(FILE))
+  .then(prod => {
+    prod.push(post);
+    return write(FILE, prod);
+  })
+  .then(()=>console.log('we saved a product!'))
+  .catch(ex => console.log(ex));
+  // res.redirect('/#/products');
+});
 
 app.listen(port, ()=> console.log(`listening on port ${port}`));

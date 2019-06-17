@@ -56,15 +56,31 @@
           this.state = {
             prod: ""
           }
+          this.onChange = this.onChange.bind(this);
+          this.onCreate = this.onCreate.bind(this);
+        }
+
+        onCreate(product){
+          event.preventDefault();
+          axios.post('/api/products/', {
+            name: product
+          })
+
+        }
+
+        onChange(ev){
+          this.setState({
+            [event.target.name]: event.target.value
+          })
         }
 
         render(){
+          const {prod} = this.state;
+          const {onChange, onCreate} = this;
 
-
-
-        return(
-          <form onSubmit="sumbit">
-            <input name="name" type="text" value ="prod" onChange = "onChange"/>
+          return(
+          <form onSubmit={()=>onCreate(prod)}>
+            <input name="prod" type="text" value ={prod} onChange = {onChange}/>
             <button type='submit'>Create a Product</button>
           </form>
         )
