@@ -47,14 +47,14 @@ const read = (filePath)=> {
   })
 }
 
-write(FILE, [{name: 'moe'}, {name: 'larry'}])
-  .then(()=> read(FILE))
-  .then(prod => {
-    prod.push({name: 'shep'});
-    return write(FILE, prod);
-  })
-  .then(()=>console.log('we saved a product!'))
-  .catch(ex => console.log(ex));
+// write(FILE, [{name: 'moe'}, {name: 'larry'}])
+//   .then(()=> read(FILE))
+//   .then(prod => {
+//     prod.push({name: 'shep'});
+//     return write(FILE, prod);
+//   })
+//   .then(()=>console.log('we saved a product!'))
+//   .catch(ex => console.log(ex));
 
 
 app.get('/', (req, res, next)=> res.sendFile(path.join(__dirname, 'index.html')));
@@ -69,18 +69,19 @@ app.post('/api/products', (req, res, next)=> {
     prod.push(post)
     write(FILE, prod)
   })
+  .then(()=>res.redirect('/#/products', 201))
 
 });
 
-app.delete('/api/products/:id?', (req, res, next)=> {
-  const deleteId = req.params.id;
+app.delete('/api/products/:id', (req, res, next)=> {
+  const deleteId = req.params.id*1;
   console.log(deleteId);
   read(FILE)
   .then(prod => {
-    prod.push(post)
-    console.log(prod);
-    write(FILE, prod)
-
+    const products = prod.filter((el, id)=>{
+    return( id !== deleteId )
+  })
+    write(FILE, products)
   })
 
 });
