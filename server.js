@@ -63,17 +63,26 @@ app.get('/api/products', (req, res, next)=> res.sendFile(path.join(__dirname, 'p
 
 app.post('/api/products', (req, res, next)=> {
   const post = req.body;
-  console.log(post);
 
-  write(FILE, [{name: 'moe'}, {name: 'larry'}])
-  .then(()=> read(FILE))
+  read(FILE)
   .then(prod => {
-    prod.push(post);
-    return write(FILE, prod);
+    prod.push(post)
+    write(FILE, prod)
   })
-  .then(()=>console.log('we saved a product!'))
-  .catch(ex => console.log(ex));
-  // res.redirect('/#/products');
+
+});
+
+app.delete('/api/products/:id?', (req, res, next)=> {
+  const deleteId = req.params.id;
+  console.log(deleteId);
+  read(FILE)
+  .then(prod => {
+    prod.push(post)
+    console.log(prod);
+    write(FILE, prod)
+
+  })
+
 });
 
 app.listen(port, ()=> console.log(`listening on port ${port}`));

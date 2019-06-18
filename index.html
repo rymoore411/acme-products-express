@@ -19,6 +19,7 @@
           this.state = {
             products: []
           }
+          this.onDelete = this.onDelete.bind(this);
         }
 
         async componentDidMount(){
@@ -26,18 +27,30 @@
           const products = await response.json();
           this.setState({products});
           console.log(products);
+        }
 
+        async onDelete(idx){
+          const products = this.state.products.filter((prod, id)=> id !== idx);
+
+          this.setState({products});
+
+          const product =  this.state.products.filter((prod, id)=> id === idx);
+
+          console.log(product);
+
+          axios.delete(`/api/products/${idx}`,{product});
 
         }
 
         render(){
           const { products } = this.state;
+          const { onDelete } = this;
           return(
             <div>{products.length}
             <div>
               <ul>{
                 products.map((product, idx)=>(
-                  <li key={idx}>{product.name}</li>
+                  <li key={idx}>{product.name}{" "}<button type = "button" onClick={ ()=> onDelete(idx)}>Destroy</button></li>
                 ))
 
               }
@@ -60,11 +73,12 @@
           this.onCreate = this.onCreate.bind(this);
         }
 
-        onCreate(product){
+        async onCreate(product){
           event.preventDefault();
           axios.post('/api/products/', {
             name: product
           })
+          location.hash = '/products'
 
         }
 
