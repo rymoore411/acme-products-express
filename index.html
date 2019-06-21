@@ -17,34 +17,16 @@
     const {HashRouter, Link, Route} = ReactRouterDOM;
 
       class Products extends React.Component{
-        constructor(){
-          super();
+        constructor(props){
+          super(props);
           this.state = {
-            products: []
+
           }
-          this.onDelete = this.onDelete.bind(this);
-        }
-
-        async componentDidMount(){
-          const response = await fetch('/api/products/');
-          const products = await response.json();
-          this.setState({products});
-          console.log(products);
-        }
-
-        async onDelete(idx){
-          event.preventDefault();
-          const products = this.state.products.filter((prod, id)=> id !== idx);
-
-          this.setState({products});
-
-          axios.delete(`/api/products/${idx}`);
 
         }
 
         render(){
-          const { products } = this.state;
-          const { onDelete } = this;
+          const { products, onDelete } = this.props;
           return(
             <div>{products.length}
             <div>
@@ -70,17 +52,9 @@
             prod: ""
           }
           this.onChange = this.onChange.bind(this);
-          this.onCreate = this.onCreate.bind(this);
         }
 
-        async onCreate(product){
-          event.preventDefault();
-          axios.post('/api/products/', {
-            name: product
-          })
-          // location.hash = '/products'
 
-        }
 
         onChange(ev){
           this.setState({
@@ -90,7 +64,8 @@
 
         render(){
           const {prod} = this.state;
-          const {onChange, onCreate} = this;
+          const {onChange} = this;
+          const {onCreate} = this.props;
 
           return(
           <form onSubmit={()=>onCreate(prod)}>
@@ -105,8 +80,53 @@
 
       const Home = ()=>(<div>Home</div>);
 
-      const App = ()=>
-      {
+      class App extends React.Component {
+
+      constructor(){
+          super();
+          this.state = {
+            products: []
+          }
+          this.onDelete = this.onDelete.bind(this);
+          this.onCreate = this.onCreate.bind(this);
+        }
+
+        async componentDidMount(){
+          const response = await fetch('/api/products/');
+          const products = await response.json();
+          this.setState({products});
+        }
+
+        async onCreate(product){
+          event.preventDefault();
+          console.log(product);
+          await axios.post('/api/products/', {
+            name: product
+          })
+          const newProducts = this.state.products;
+          newProducts.push({name: product});
+          this.setState({products: newProducts});
+          console.log(this.state.products);
+          window.location.hash = 'products';
+
+
+        }
+
+        async onDelete(idx){
+          event.preventDefault();
+          const products = this.state.products.filter((prod, id)=> id !== idx);
+
+          this.setState({products});
+
+          axios.delete(`/api/products/${idx}`);
+
+        }
+
+        render(){
+          const { products } = this.state;
+          const { onDelete, onCreate } = this;
+
+
         return(
           <HashRouter>
             <h2>Acme Products</h2>
@@ -114,11 +134,12 @@
             <Link to = '/products'>Products</Link>
             <Link to = '/create'>Create A Product</Link>
             <Route path = '/' exact component = {Home}/>
-            <Route path = '/products' component = {Products}/>
-            <Route path = '/create' component = {CreateProd}/>
+            <Route path = '/products' render={()=><Products products={products} onDelete={onDelete}/>}/>
+            <Route path = '/create' render={()=><CreateProd onCreate={onCreate}/>}/>
           </HashRouter>
         )
       }
+    }
 
       const root = document.querySelector('#root');
       ReactDOM.render(<App />, root);

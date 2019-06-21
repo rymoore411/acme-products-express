@@ -47,15 +47,6 @@ const read = (filePath)=> {
   })
 }
 
-// write(FILE, [{name: 'moe'}, {name: 'larry'}])
-//   .then(()=> read(FILE))
-//   .then(prod => {
-//     prod.push({name: 'shep'});
-//     return write(FILE, prod);
-//   })
-//   .then(()=>console.log('we saved a product!'))
-//   .catch(ex => console.log(ex));
-
 
 app.get('/', (req, res, next)=> res.sendFile(path.join(__dirname, 'index.html')));
 
@@ -69,7 +60,7 @@ app.post('/api/products', (req, res, next)=> {
     prod.push(post)
     write(FILE, prod)
   })
-  .then(()=>res.redirect('/#/products', 201))
+  .then(()=>res.send('products'))
 
 });
 
